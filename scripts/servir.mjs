@@ -3,7 +3,7 @@
 import { createReadStream } from 'node:fs';
 import { stat } from 'node:fs/promises';
 import { createServer } from 'node:http';
-import { extname, join, normalize } from 'node:path';
+import { extname, join, normalize, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const TIPOS = {
@@ -17,10 +17,27 @@ const TIPOS = {
   '.woff2': 'font/woff2',
 };
 
+/** Caminho do ficheiro dentro de `pasta`, ou `null` se a URL for inválida ou sair da pasta. */
+export function resolverCaminho(url, pasta = 'dist') {
+  let caminho;
+  try {
+    caminho = decodeURIComponent(new URL(url ?? '/', 'http://localhost').pathname);
+  } catch {
+    return null; // ex.: "/%" (URIError)
+  }
+  const raiz = resolve(pasta);
+  const ficheiro = resolve(raiz, `.${normalize(`/${caminho}`)}`);
+  if (ficheiro !== raiz && !ficheiro.startsWith(raiz + sep)) return null; // ex.: "/%2e%2e/"
+  return ficheiro;
+}
+
 export function servir(porta, pasta = 'dist') {
   return createServer(async (pedido, resposta) => {
-    const caminho = normalize(decodeURIComponent(new URL(pedido.url ?? '/', 'http://localhost').pathname));
-    let ficheiro = join(pasta, caminho);
+    let ficheiro = resolverCaminho(pedido.url, pasta);
+    if (ficheiro === null) {
+      resposta.writeHead(400).end();
+      return;
+    }
     try {
       if ((await stat(ficheiro)).isDirectory()) ficheiro = join(ficheiro, 'index.html');
       await stat(ficheiro);
