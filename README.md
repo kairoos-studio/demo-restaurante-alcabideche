@@ -39,8 +39,10 @@ no terminal). Parar com `Ctrl+C`; se o Astro o tiver posto em segundo plano
 
 Tudo o que falta confirmar está em **`src/config/restaurante.ts`**, o único
 ficheiro a editar. O que está a `null` aparece no site como marcador discreto
-(tracejado, ex.: `—,— €`); o texto `[POR CONFIRMAR: …]` fica no `title` e para
-leitores de ecrã. Nada disto foi inventado:
+(tracejado, ex.: `—,— €`), e cada bloco com tracejados tem uma legenda visível
+"por confirmar" (horário, destaques, carta e telefone do rodapé). O texto
+`[POR CONFIRMAR: …]` fica no `title` e para leitores de ecrã. Nada disto foi
+inventado:
 
 | Marcador | Onde aparece | Campo |
 |---|---|---|
@@ -72,7 +74,9 @@ e no rodapé do site. O padrão de azulejo é um SVG desenhado para o projeto.
 ## Limites desta demo
 
 - O formulário de reserva é uma simulação: mostra uma confirmação mas não envia
-  nem guarda nada (está assinalado no próprio formulário).
+  nem guarda nada (está assinalado no próprio formulário). Sem JavaScript, os
+  campos e o botão ficam desativados e aparece uma nota a explicar, para que
+  nada seja submetido.
 - Mapa só por link (pesquisa no Google Maps), sem embed nem chave.
 
 Projeto aperfeiçoado com a ajuda de IA.
