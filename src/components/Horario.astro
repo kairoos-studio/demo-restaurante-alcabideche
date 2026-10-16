@@ -2,6 +2,9 @@
 import PorConfirmar from './PorConfirmar.astro';
 import { restaurante } from '../config/restaurante';
 import { MARCADOR_DIAS, MARCADOR_HORAS } from '../lib/formatar';
+
+const porConfirmar =
+  restaurante.descanso === null || restaurante.horario.some((l) => l.dias === null || l.horas === null);
 ---
 
 <section class="seccao horario" id="horario" aria-labelledby="horario-titulo">
@@ -13,20 +16,29 @@ import { MARCADOR_DIAS, MARCADOR_HORAS } from '../lib/formatar';
     </div>
 
     <div class="placa revelar">
-      <dl class="placa__linhas">
+      <div class="placa__linhas">
+        <dl>
+          {
+            restaurante.horario.map((linha) => (
+              <div class="placa__linha">
+                <dt>{linha.dias ?? <PorConfirmar tipo="horário" marcador={MARCADOR_DIAS} />}</dt>
+                <dd>{linha.horas ?? <PorConfirmar tipo="horário" marcador={MARCADOR_HORAS} />}</dd>
+              </div>
+            ))
+          }
+          <div class="placa__linha placa__linha--descanso">
+            <dt>Descanso</dt>
+            <dd>{restaurante.descanso ?? <PorConfirmar tipo="horário" marcador="—" />}</dd>
+          </div>
+        </dl>
         {
-          restaurante.horario.map((linha) => (
-            <div class="placa__linha">
-              <dt>{linha.dias ?? <PorConfirmar tipo="horário" marcador={MARCADOR_DIAS} />}</dt>
-              <dd>{linha.horas ?? <PorConfirmar tipo="horário" marcador={MARCADOR_HORAS} />}</dd>
-            </div>
-          ))
+          porConfirmar && (
+            <p class="legenda-pc placa__legenda" data-legenda-por-confirmar>
+              Horário por confirmar com a casa
+            </p>
+          )
         }
-        <div class="placa__linha placa__linha--descanso">
-          <dt>Descanso</dt>
-          <dd>{restaurante.descanso ?? <PorConfirmar tipo="horário" marcador="—" />}</dd>
-        </div>
-      </dl>
+      </div>
 
       <ul class="servicos" aria-label="Serviços">
         {restaurante.servicos.map((s) => <li>{s}</li>)}
@@ -78,6 +90,10 @@ import { MARCADOR_DIAS, MARCADOR_HORAS } from '../lib/formatar';
   .placa__linha--descanso {
     border-bottom: 0;
     color: var(--vinho);
+  }
+
+  .placa__legenda {
+    padding-block: 0 0.75rem;
   }
 
   .servicos {

@@ -4,6 +4,9 @@ import PorConfirmar from './PorConfirmar.astro';
 import { destaques, menu } from '../config/restaurante';
 import { fotos } from '../config/imagens';
 import { formatarPreco, MARCADOR_PRECO } from '../lib/formatar';
+
+const destaquesPorConfirmar = destaques.some((d) => d.preco === null);
+const cartaPorConfirmar = menu.some((g) => g.itens.some((i) => i.preco === null));
 ---
 
 <section class="seccao menu" id="menu" aria-labelledby="menu-titulo">
@@ -12,6 +15,13 @@ import { formatarPreco, MARCADOR_PRECO } from '../lib/formatar';
       <p class="sobretitulo">A carta</p>
       <h2 id="menu-titulo">Os da casa</h2>
       <p class="menu__intro">Os pratos de que mais se fala, e os que vale a pena guardar espaço para provar.</p>
+      {
+        destaquesPorConfirmar && (
+          <p class="legenda-pc menu__legenda" data-legenda-por-confirmar>
+            Preços por confirmar com a casa
+          </p>
+        )
+      }
     </div>
 
     <ol class="destaques">
@@ -42,6 +52,13 @@ import { formatarPreco, MARCADOR_PRECO } from '../lib/formatar';
 
     <div class="carta revelar">
       <p class="carta__titulo">Também na carta</p>
+      {
+        cartaPorConfirmar && (
+          <p class="legenda-pc carta__legenda" data-legenda-por-confirmar>
+            Preços por confirmar
+          </p>
+        )
+      }
       {
         menu.map((grupo) => (
           <div class="carta__grupo">
@@ -79,6 +96,16 @@ import { formatarPreco, MARCADOR_PRECO } from '../lib/formatar';
     margin-top: 0.9rem;
     max-width: 36ch;
     color: var(--cinza);
+  }
+
+  .menu__legenda {
+    margin-top: 0.9rem;
+  }
+
+  .carta__legenda {
+    display: flex;
+    justify-content: center;
+    margin-top: 0.3rem;
   }
 
   .destaques {

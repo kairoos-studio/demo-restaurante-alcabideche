@@ -221,3 +221,20 @@ a {
   opacity: 1;
   transform: none;
 }
+
+/* Legenda visível dos blocos com dados ainda por confirmar (os tracejados). */
+.legenda-pc {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: var(--f-titulo);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--cinza);
+}
+
+.legenda-pc::before {
+  content: '';
+  width: 1.4rem;
+  border-bottom: 1.5px dashed currentColor;
+}

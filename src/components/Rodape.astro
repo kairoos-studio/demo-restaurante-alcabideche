@@ -22,7 +22,16 @@ const ano = new Date().getFullYear();
       </div>
       <div>
         <dt>Telefone</dt>
-        <dd>{restaurante.telefone ?? <PorConfirmar tipo="telefone" marcador={MARCADOR_TELEFONE} />}</dd>
+        <dd>
+          {
+            restaurante.telefone ?? (
+              <>
+                <PorConfirmar tipo="telefone" marcador={MARCADOR_TELEFONE} />
+                <span class="rodape__pc" data-legenda-por-confirmar>por confirmar</span>
+              </>
+            )
+          }
+        </dd>
       </div>
       <div>
         <dt>Pagamentos</dt>
@@ -98,6 +107,12 @@ const ano = new Date().getFullYear();
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: rgb(255 255 255 / 0.55);
+  }
+
+  .rodape__pc {
+    margin-left: 0.5rem;
+    font-size: 0.8rem;
+    color: rgb(255 255 255 / 0.6);
   }
 
   .rodape__links {
