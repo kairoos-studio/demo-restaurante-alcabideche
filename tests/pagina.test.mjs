@@ -72,6 +72,16 @@ test('formulário de reserva é simulação e está assinalado', () => {
   assert.doesNotMatch(html, /<form[^>]*(action|method)=/, 'o formulário não deve ter action nem method');
   assert.match(texto, /Simulação · não envia/);
   assert.match(texto, /nada foi enviado nem guardado/);
+  // Sem JavaScript não há submissão: os campos e o botão nascem desativados.
+  assert.match(html, /<fieldset[^>]*id="campos-reserva"[^>]*disabled|<fieldset[^>]*disabled[^>]*id="campos-reserva"/);
+  assert.match(html, /<noscript>[\s\S]*?precisa de JavaScript[\s\S]*?<\/noscript>/);
+});
+
+test('legenda visível "por confirmar" em cada bloco com marcadores', () => {
+  const legendas = html.match(/data-legenda-por-confirmar/g) ?? [];
+  assert.equal(legendas.length, 4, 'horário, destaques, carta e telefone do rodapé');
+  assert.match(texto, /Horário por confirmar com a casa/);
+  assert.match(texto, /Preços por confirmar com a casa/);
 });
 
 test('sem serviços externos: scripts, estilos, iframes, fontes e analytics', () => {

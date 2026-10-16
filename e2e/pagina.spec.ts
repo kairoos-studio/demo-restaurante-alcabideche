@@ -96,15 +96,17 @@ test('telefone e WhatsApp por confirmar: botões desativados e assinalados', asy
   await expect(page.locator('a[href^="tel:"], a[href*="wa.me"]')).toHaveCount(0);
 });
 
-test('marcadores por confirmar discretos, com o texto no title', async ({ page }) => {
+test('marcadores por confirmar discretos, explicados por legenda visível em cada bloco', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('[data-por-confirmar="preço"]')).toHaveCount(8);
   await expect(page.locator('[data-por-confirmar="telefone"]')).toHaveCount(1);
   await expect(page.locator('[data-por-confirmar="horário"]').first()).toHaveAttribute('title', '[POR CONFIRMAR: horário]');
-  // O texto "[POR CONFIRMAR: …]" fica só para leitores de ecrã: no ecrã ocupa 1 px no máximo.
-  const caixas = await page.locator('.pc .sr-only').evaluateAll((els) => els.map((e) => e.getBoundingClientRect().width));
-  expect(caixas.length).toBeGreaterThan(0);
-  for (const largura of caixas) expect(largura).toBeLessThanOrEqual(1);
+  // Cada bloco com tracejados tem, no ecrã, uma legenda "por confirmar".
+  for (const bloco of ['.placa', '.menu__topo', '.carta', '.rodape__dados', '#reservar']) {
+    const legenda = page.locator(bloco).getByText(/por confirmar/i).first();
+    await legenda.scrollIntoViewIfNeeded();
+    await expect(legenda, `legenda em falta em ${bloco}`).toBeVisible();
+  }
 });
 
 test('créditos das imagens no rodapé abrem e ligam às páginas de origem', async ({ page }) => {
@@ -143,6 +145,25 @@ test('funciona sem JavaScript: conteúdo visível', async ({ browser }) => {
   await page.goto('/');
   await page.locator('#menu').scrollIntoViewIfNeeded();
   await expect(page.locator('.destaque').first()).toHaveCSS('opacity', '1');
+  await ctx.close();
+});
+
+test('sem JavaScript o formulário fica desativado e não envia nada', async ({ browser, baseURL }) => {
+  const ctx = await browser.newContext({ javaScriptEnabled: false, baseURL });
+  const page = await ctx.newPage();
+  const pedidos: string[] = [];
+  page.on('request', (r) => r.resourceType() === 'document' && pedidos.push(r.url()));
+  await page.goto('/');
+  await expect(page.locator('#campos-reserva')).toHaveAttribute('disabled', '');
+  await expect(page.getByLabel('Nome')).toBeDisabled();
+  const enviar = page.getByRole('button', { name: 'Pedir reserva' });
+  await expect(enviar).toBeDisabled();
+  await expect(page.locator('.form__semjs')).toBeVisible();
+  await expect(page.locator('.form__semjs')).toContainText('Esta simulação precisa de JavaScript.');
+  await enviar.click({ force: true });
+  await page.waitForTimeout(300);
+  expect(page.url()).not.toContain('?');
+  expect(pedidos).toHaveLength(1);
   await ctx.close();
 });
 
