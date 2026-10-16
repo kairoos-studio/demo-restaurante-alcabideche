@@ -118,19 +118,48 @@ test('créditos das imagens no rodapé abrem e ligam às páginas de origem', as
   await expect(links.first()).toHaveAttribute('href', /^https:\/\/commons\.wikimedia\.org\/wiki\/File:/);
 });
 
-test('barra de atalhos só no telemóvel, depois do hero e fora da reserva', async ({ page, isMobile }) => {
+/** Tenta pôr o foco no primeiro link da barra e diz se conseguiu. */
+const focaBarra = (page: Page) =>
+  page.locator('[data-barra] a').first().evaluate((a: HTMLElement) => {
+    a.focus();
+    return document.activeElement === a;
+  });
+
+test('barra de atalhos só no telemóvel, depois do hero e fora da reserva; escondida não recebe foco', async ({
+  page,
+  isMobile,
+}) => {
   await page.goto('/');
   const barra = page.locator('[data-barra]');
   if (!isMobile) {
     await expect(barra).toBeHidden();
+    expect(await focaBarra(page)).toBe(false);
     return;
   }
   await expect(barra).not.toHaveClass(/barra--visivel/);
+  await expect(barra).toHaveAttribute('inert', '');
+  expect(await focaBarra(page), 'no hero, a barra escondida não pode receber foco').toBe(false);
+
   await page.locator('#menu').scrollIntoViewIfNeeded();
   await expect(barra).toHaveClass(/barra--visivel/);
+  await expect(barra).not.toHaveAttribute('inert');
   await expect(barra.getByRole('link', { name: 'Reservar' })).toBeInViewport();
+  expect(await focaBarra(page)).toBe(true);
+
   await page.locator('#form-reserva').scrollIntoViewIfNeeded();
   await expect(barra).not.toHaveClass(/barra--visivel/);
+  await expect(barra).toHaveAttribute('inert', '');
+  expect(await focaBarra(page), 'no formulário, a barra escondida não pode receber foco').toBe(false);
+});
+
+test('no telemóvel, Tab a partir do hero não entra na barra escondida', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'a barra só existe no telemóvel');
+  await page.goto('/');
+  await page.getByRole('link', { name: 'Ver a carta' }).focus();
+  for (let i = 0; i < 3; i++) {
+    await page.keyboard.press('Shift+Tab');
+    expect(await page.evaluate(() => !!document.activeElement?.closest('[data-barra]'))).toBe(false);
+  }
 });
 
 test('sem deslocamento horizontal', async ({ page }) => {

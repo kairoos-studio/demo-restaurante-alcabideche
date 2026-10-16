@@ -2,7 +2,8 @@
 /** Barra fixa no telemóvel, que aparece depois do hero. */
 ---
 
-<nav class="barra" data-barra aria-label="Atalhos">
+<!-- Nasce inerte (fora da tabulação); só fica ativa quando aparece. -->
+<nav class="barra" data-barra aria-label="Atalhos" inert>
   <a href="#menu">Carta</a>
   <a href="#onde">Mapa</a>
   <a class="barra__reservar" href="#reservar">Reservar</a>
@@ -15,7 +16,12 @@
   if (barra && hero && 'IntersectionObserver' in window) {
     let depoisDoHero = false;
     let naReserva = false;
-    const atualizar = () => barra.classList.toggle('barra--visivel', depoisDoHero && !naReserva);
+    const atualizar = () => {
+      const visivel = depoisDoHero && !naReserva;
+      barra.classList.toggle('barra--visivel', visivel);
+      // Escondida, sai da tabulação e dos leitores de ecrã.
+      barra.inert = !visivel;
+    };
     new IntersectionObserver(([e]) => {
       depoisDoHero = !e.isIntersecting;
       atualizar();
@@ -51,11 +57,16 @@
       0 0 0 1.5px var(--azul),
       0 14px 30px -12px rgb(14 29 71 / 0.55);
     transform: translateY(160%);
-    transition: transform 0.3s ease;
+    visibility: hidden;
+    transition:
+      transform 0.3s ease,
+      visibility 0s linear 0.3s;
   }
 
   .barra--visivel {
     transform: none;
+    visibility: visible;
+    transition: transform 0.3s ease;
   }
 
   .barra a {
