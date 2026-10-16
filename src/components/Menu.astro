@@ -1,0 +1,271 @@
+---
+import { Image } from 'astro:assets';
+import PorConfirmar from './PorConfirmar.astro';
+import { destaques, menu } from '../config/restaurante';
+import { fotos } from '../config/imagens';
+import { formatarPreco, MARCADOR_PRECO } from '../lib/formatar';
+
+const destaquesPorConfirmar = destaques.some((d) => d.preco === null);
+const cartaPorConfirmar = menu.some((g) => g.itens.some((i) => i.preco === null));
+---
+
+<section class="seccao menu" id="menu" aria-labelledby="menu-titulo">
+  <div class="contentor">
+    <div class="menu__topo revelar">
+      <p class="sobretitulo">A carta</p>
+      <h2 id="menu-titulo">Os da casa</h2>
+      <p class="menu__intro">Os pratos de que mais se fala, e os que vale a pena guardar espaço para provar.</p>
+      {
+        destaquesPorConfirmar && (
+          <p class="legenda-pc menu__legenda" data-legenda-por-confirmar>
+            Preços por confirmar com a casa
+          </p>
+        )
+      }
+    </div>
+
+    <ol class="destaques">
+      {
+        destaques.map((d, i) => {
+          const foto = fotos[d.foto];
+          return (
+            <li class="destaque revelar">
+              <div class="destaque__foto">
+                <Image src={foto.src} alt={foto.alt} widths={[480, 800]} sizes="(min-width: 900px) 360px, 92vw" />
+                <span class="destaque__numero" aria-hidden="true">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+              </div>
+              <div class="destaque__texto">
+                <p class="destaque__nota">{d.nota}</p>
+                <h3>{d.nome}</h3>
+                <p class="destaque__descricao">{d.descricao}</p>
+                <p class="destaque__preco">
+                  {d.preco === null ? <PorConfirmar tipo="preço" marcador={MARCADOR_PRECO} /> : formatarPreco(d.preco)}
+                </p>
+              </div>
+            </li>
+          );
+        })
+      }
+    </ol>
+
+    <div class="carta revelar">
+      <p class="carta__titulo">Também na carta</p>
+      {
+        cartaPorConfirmar && (
+          <p class="legenda-pc carta__legenda" data-legenda-por-confirmar>
+            Preços por confirmar
+          </p>
+        )
+      }
+      {
+        menu.map((grupo) => (
+          <div class="carta__grupo">
+            <h3>{grupo.titulo}</h3>
+            <ul>
+              {grupo.itens.map((item) => (
+                <li class="carta__item">
+                  <span class="carta__nome">{item.nome}</span>
+                  <span class="carta__pontos" aria-hidden="true" />
+                  <span class="carta__preco">
+                    {item.preco === null ? (
+                      <PorConfirmar tipo="preço" marcador={MARCADOR_PRECO} />
+                    ) : (
+                      formatarPreco(item.preco)
+                    )}
+                  </span>
+                  <span class="carta__descricao">{item.descricao}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+      <p class="carta__rodape">Pergunte pelo peixe fresco do dia.</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .menu {
+    background: var(--areia);
+  }
+
+  .menu__intro {
+    margin-top: 0.9rem;
+    max-width: 36ch;
+    color: var(--cinza);
+  }
+
+  .menu__legenda {
+    margin-top: 0.9rem;
+  }
+
+  .carta__legenda {
+    display: flex;
+    justify-content: center;
+    margin-top: 0.3rem;
+  }
+
+  .destaques {
+    margin-top: 2.25rem;
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .destaque {
+    background: var(--cal);
+    border-radius: var(--raio);
+    overflow: hidden;
+    box-shadow: 0 1px 0 var(--linha);
+  }
+
+  .destaque__foto {
+    position: relative;
+    aspect-ratio: 4 / 3;
+  }
+
+  .destaque__foto img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .destaque__numero {
+    position: absolute;
+    left: 0.9rem;
+    bottom: -1.1rem;
+    display: grid;
+    place-items: center;
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: 50%;
+    background: var(--azul);
+    color: #fff;
+    font-family: var(--f-titulo);
+    font-weight: 700;
+    font-size: 0.95rem;
+    box-shadow: 0 0 0 4px var(--cal);
+  }
+
+  .destaque__texto {
+    padding: 1.6rem 1.25rem 1.25rem;
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .destaque__nota {
+    font-family: var(--f-titulo);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--vinho);
+  }
+
+  .destaque h3 {
+    font-size: 1.75rem;
+    color: var(--azul);
+  }
+
+  .destaque__descricao {
+    color: var(--cinza);
+  }
+
+  .destaque__preco {
+    margin-top: 0.35rem;
+    font-family: var(--f-titulo);
+    font-weight: 700;
+    font-size: 1.15rem;
+  }
+
+  /* Carta em papel, como a que vem para a mesa. */
+  .carta {
+    margin-top: 2.5rem;
+    background: var(--cal);
+    border: 2px solid var(--azul);
+    outline: 1px solid var(--azul);
+    outline-offset: -8px;
+    border-radius: 4px;
+    padding: 1.75rem 1.25rem 1.5rem;
+  }
+
+  .carta__titulo {
+    font-family: var(--f-titulo);
+    font-size: 1.6rem;
+    font-weight: 750;
+    text-align: center;
+    color: var(--azul);
+  }
+
+  .carta__grupo {
+    margin-top: 1.4rem;
+  }
+
+  .carta__grupo h3 {
+    font-size: 0.8rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--vinho);
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--linha);
+  }
+
+  .carta__item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: baseline;
+    column-gap: 0.5rem;
+    padding-block: 0.7rem;
+  }
+
+  .carta__nome {
+    font-family: var(--f-titulo);
+    font-weight: 650;
+    font-size: 1.1rem;
+  }
+
+  .carta__pontos {
+    border-bottom: 2px dotted rgb(23 32 54 / 0.3);
+    transform: translateY(-0.3em);
+  }
+
+  .carta__preco {
+    font-family: var(--f-titulo);
+    font-weight: 650;
+  }
+
+  .carta__descricao {
+    grid-column: 1 / -1;
+    font-size: 0.95rem;
+    color: var(--cinza);
+  }
+
+  .carta__rodape {
+    margin-top: 1.2rem;
+    text-align: center;
+    font-style: italic;
+    color: var(--cinza);
+    font-size: 0.95rem;
+  }
+
+  @media (min-width: 900px) {
+    .destaques {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    .carta {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      column-gap: 2.5rem;
+      padding: 2.5rem 2.75rem 2rem;
+    }
+
+    .carta__titulo,
+    .carta__rodape {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

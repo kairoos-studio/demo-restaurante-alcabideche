@@ -1,0 +1,3 @@
+# Conceito não oficial: não indexar.
+User-agent: *
+Disallow: /

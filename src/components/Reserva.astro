@@ -1,0 +1,357 @@
+---
+import { restaurante } from '../config/restaurante';
+import { linkTelefone, linkWhatsApp } from '../lib/formatar';
+
+const telefone = linkTelefone(restaurante.telefone);
+const whatsapp = linkWhatsApp(restaurante.whatsapp, restaurante.mensagemReserva);
+const porConfirmar = [!telefone && 'Telefone', !whatsapp && 'WhatsApp'].filter(Boolean).join(' e ');
+const pessoas = Array.from({ length: 10 }, (_, i) => i + 1);
+---
+
+<section class="seccao reserva" id="reservar" aria-labelledby="reserva-titulo">
+  <div class="contentor reserva__grelha">
+    <div class="reserva__intro revelar">
+      <p class="sobretitulo">Reservas</p>
+      <h2 id="reserva-titulo">Guarde já a sua mesa.</h2>
+      <p class="reserva__texto">Ligue, mande mensagem ou deixe o pedido aqui em baixo.</p>
+
+      <div class="reserva__botoes">
+        {
+          telefone ? (
+            <a class="botao botao--principal" href={telefone} data-contacto="telefone">
+              Ligar
+            </a>
+          ) : (
+            <button class="botao botao--principal" type="button" disabled data-contacto="telefone">
+              Ligar
+            </button>
+          )
+        }
+        {
+          whatsapp ? (
+            <a class="botao botao--contorno" href={whatsapp} target="_blank" rel="noopener" data-contacto="whatsapp">
+              WhatsApp
+            </a>
+          ) : (
+            <button class="botao botao--contorno" type="button" disabled data-contacto="whatsapp">
+              WhatsApp
+            </button>
+          )
+        }
+      </div>
+      {
+        porConfirmar && (
+          <p class="reserva__pendente" data-contacto-pendente>
+            {!telefone && <span class="sr-only">[POR CONFIRMAR: telefone] </span>}
+            {!whatsapp && <span class="sr-only">[POR CONFIRMAR: WhatsApp] </span>}
+            {porConfirmar} por confirmar. Com o número configurado, o botão fica ativo.
+          </p>
+        )
+      }
+    </div>
+
+    <div class="cartao revelar">
+      <form class="form" id="form-reserva" novalidate>
+        <div class="form__topo">
+          <p class="form__titulo">Pedido de reserva</p>
+          <span class="mock" title="Demonstração: este formulário não envia dados">Simulação · não envia</span>
+        </div>
+
+        <noscript>
+          <p class="form__semjs">Esta simulação precisa de JavaScript. Sem ele, o formulário fica desativado e nada é enviado.</p>
+        </noscript>
+
+        <!-- Desativado até o script ligar a simulação: sem JS, não há submissão possível. -->
+        <fieldset class="form__campos" id="campos-reserva" disabled>
+          <label class="campo">
+            <span>Nome</span>
+            <input name="nome" autocomplete="name" required placeholder="O seu nome" />
+          </label>
+
+          <div class="campo__par">
+            <label class="campo">
+              <span>Dia</span>
+              <input name="dia" type="date" required />
+            </label>
+            <label class="campo">
+              <span>Hora</span>
+              <input name="hora" type="time" required />
+            </label>
+          </div>
+
+          <label class="campo">
+            <span>Pessoas</span>
+            <select name="pessoas" required>
+              {pessoas.map((n) => <option value={n} selected={n === 2}>{n === 10 ? '10 ou mais' : n}</option>)}
+            </select>
+          </label>
+
+          <label class="campo">
+            <span>Notas <small>(opcional)</small></span>
+            <textarea name="notas" rows="2" placeholder="Aniversário, cadeira de bebé, mesa grande…"></textarea>
+          </label>
+
+          <p class="form__erro" role="alert" hidden>Preencha o nome, o dia e a hora.</p>
+
+          <button class="botao botao--principal form__enviar" type="submit">Pedir reserva</button>
+        </fieldset>
+      </form>
+
+      <div class="confirmacao" id="confirmacao" hidden tabindex="-1">
+        <p class="confirmacao__selo">Pedido registado</p>
+        <p class="confirmacao__resumo" id="confirmacao-resumo"></p>
+        <p class="confirmacao__mock">
+          <strong>Simulação:</strong> nesta demonstração nada foi enviado nem guardado. No site final, o pedido chegaria
+          ao restaurante.
+        </p>
+        <button class="botao botao--contorno" type="button" id="nova-reserva">Fazer outro pedido</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Formulário de demonstração (simulação): não envia nem guarda dados.
+  import { dataLocalISO, resumoReserva } from '../lib/formatar';
+
+  const form = document.querySelector<HTMLFormElement>('#form-reserva');
+  const confirmacao = document.querySelector<HTMLElement>('#confirmacao');
+  const resumo = document.querySelector<HTMLElement>('#confirmacao-resumo');
+  const erro = form?.querySelector<HTMLElement>('.form__erro');
+  const dia = form?.querySelector<HTMLInputElement>('input[name="dia"]');
+
+  if (dia) dia.min = dataLocalISO(new Date());
+
+  // A simulação só fica ativa depois de o handler que impede o envio estar instalado (mais abaixo).
+  const campos = document.querySelector<HTMLFieldSetElement>('#campos-reserva');
+
+  form?.addEventListener('submit', (evento) => {
+    evento.preventDefault();
+    const nome = form.querySelector<HTMLInputElement>('input[name="nome"]');
+    if (nome) nome.value = nome.value.trim();
+    if (!form.checkValidity()) {
+      if (erro) erro.hidden = false;
+      form.querySelector<HTMLElement>(':invalid')?.focus();
+      return;
+    }
+    if (erro) erro.hidden = true;
+    const dados = new FormData(form);
+    if (resumo) {
+      resumo.textContent = resumoReserva(
+        String(dados.get('nome')),
+        String(dados.get('pessoas')),
+        String(dados.get('dia')),
+        String(dados.get('hora')),
+      );
+    }
+    form.hidden = true;
+    if (confirmacao) {
+      confirmacao.hidden = false;
+      confirmacao.focus();
+    }
+  });
+
+  if (campos) campos.disabled = false;
+
+  document.querySelector('#nova-reserva')?.addEventListener('click', () => {
+    form?.reset();
+    if (form) form.hidden = false;
+    if (confirmacao) confirmacao.hidden = true;
+    form?.querySelector<HTMLInputElement>('input[name="nome"]')?.focus();
+  });
+</script>
+
+<style>
+  .reserva {
+    background:
+      linear-gradient(rgb(250 246 238 / 0.93), rgb(250 246 238 / 0.93)),
+      var(--azulejo) center / 56px;
+  }
+
+  .reserva__grelha {
+    display: grid;
+    gap: 2.25rem;
+  }
+
+  .reserva__texto {
+    margin-top: 0.9rem;
+    color: var(--cinza);
+    max-width: 32ch;
+  }
+
+  .reserva__botoes {
+    margin-top: 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.7rem;
+    max-width: 24rem;
+  }
+
+  .reserva__pendente {
+    margin-top: 0.75rem;
+    max-width: 24rem;
+    font-size: 0.85rem;
+    color: var(--cinza);
+    border-left: 3px dashed var(--vinho);
+    padding-left: 0.75rem;
+  }
+
+  .cartao {
+    background: #fff;
+    border-radius: calc(var(--raio) + 4px);
+    padding: 1.5rem 1.25rem;
+    border-top: 6px solid var(--azul);
+    box-shadow: 0 30px 60px -36px rgb(14 29 71 / 0.55);
+  }
+
+  .form {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .form__campos {
+    display: grid;
+    gap: 1rem;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+  }
+
+  .form__semjs {
+    font-size: 0.9rem;
+    color: var(--vinho);
+    font-weight: 600;
+  }
+
+  .form__topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .form__titulo {
+    font-family: var(--f-titulo);
+    font-size: 1.4rem;
+    font-weight: 750;
+    color: var(--azul);
+  }
+
+  .mock {
+    font-family: var(--f-titulo);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    color: var(--vinho);
+    border: 1.5px dashed var(--vinho);
+  }
+
+  .campo {
+    display: grid;
+    gap: 0.35rem;
+    font-family: var(--f-titulo);
+    font-size: 0.9rem;
+    font-weight: 650;
+    min-width: 0;
+  }
+
+  .campo small {
+    font-weight: 400;
+    color: var(--cinza);
+  }
+
+  .campo__par {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  input,
+  select,
+  textarea {
+    font: inherit;
+    font-family: var(--f-texto);
+    font-size: 1rem;
+    font-weight: 400;
+    width: 100%;
+    min-width: 0;
+    min-height: 3rem;
+    padding: 0.7rem 0.85rem;
+    border-radius: 8px;
+    border: 1.5px solid var(--linha);
+    background: var(--cal);
+    color: var(--tinta);
+    appearance: none;
+  }
+
+  textarea {
+    resize: vertical;
+  }
+
+  input:focus,
+  select:focus,
+  textarea:focus {
+    outline: none;
+    border-color: var(--azul);
+    box-shadow: 0 0 0 3px rgb(29 63 145 / 0.2);
+  }
+
+  .form__erro {
+    color: var(--vinho);
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .form__enviar {
+    width: 100%;
+  }
+
+  .confirmacao {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+    outline: none;
+  }
+
+  .confirmacao[hidden],
+  .form[hidden] {
+    display: none;
+  }
+
+  .confirmacao__selo {
+    font-family: var(--f-titulo);
+    font-size: 1.9rem;
+    font-weight: 800;
+    color: var(--azul);
+  }
+
+  .confirmacao__resumo {
+    font-size: 1.1rem;
+  }
+
+  .confirmacao__mock {
+    font-size: 0.9rem;
+    color: var(--cinza);
+    background: var(--cal);
+    border-left: 3px solid var(--vinho);
+    padding: 0.75rem 1rem;
+    border-radius: 0 8px 8px 0;
+  }
+
+  @media (min-width: 860px) {
+    .reserva__grelha {
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 4rem;
+    }
+
+    .cartao {
+      padding: 2rem;
+    }
+  }
+</style>

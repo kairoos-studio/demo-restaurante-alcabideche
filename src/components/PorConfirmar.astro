@@ -1,0 +1,29 @@
+---
+/**
+ * Marcador discreto para dados não confirmados.
+ * Mostra um tracejado (ex.: "—,— €"); o texto [POR CONFIRMAR: tipo] fica no
+ * title, no data-atributo e para leitores de ecrã.
+ */
+interface Props {
+  tipo: 'horário' | 'telefone' | 'preço' | 'WhatsApp';
+  marcador: string;
+}
+
+const { tipo, marcador } = Astro.props;
+const etiqueta = `[POR CONFIRMAR: ${tipo}]`;
+---
+
+<span class="pc" data-por-confirmar={tipo} title={etiqueta}>
+  <span aria-hidden="true">{marcador}</span>
+  <span class="sr-only">{etiqueta}</span>
+</span>
+
+<style>
+  .pc {
+    white-space: nowrap;
+    opacity: 0.6;
+    border-bottom: 1.5px dashed currentColor;
+    font-variant-numeric: tabular-nums;
+    cursor: help;
+  }
+</style>

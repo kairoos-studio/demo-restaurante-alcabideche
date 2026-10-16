@@ -1,0 +1,123 @@
+---
+import PorConfirmar from './PorConfirmar.astro';
+import { restaurante } from '../config/restaurante';
+import { MARCADOR_DIAS, MARCADOR_HORAS } from '../lib/formatar';
+
+const porConfirmar =
+  restaurante.descanso === null || restaurante.horario.some((l) => l.dias === null || l.horas === null);
+---
+
+<section class="seccao horario" id="horario" aria-labelledby="horario-titulo">
+  <div class="contentor horario__grelha">
+    <div class="revelar">
+      <p class="sobretitulo">Quando vir</p>
+      <h2 id="horario-titulo">Horário</h2>
+      <p class="horario__nota">Tudo num só sítio, para não ter de ligar a perguntar.</p>
+    </div>
+
+    <div class="placa revelar">
+      <div class="placa__linhas">
+        <dl>
+          {
+            restaurante.horario.map((linha) => (
+              <div class="placa__linha">
+                <dt>{linha.dias ?? <PorConfirmar tipo="horário" marcador={MARCADOR_DIAS} />}</dt>
+                <dd>{linha.horas ?? <PorConfirmar tipo="horário" marcador={MARCADOR_HORAS} />}</dd>
+              </div>
+            ))
+          }
+          <div class="placa__linha placa__linha--descanso">
+            <dt>Descanso</dt>
+            <dd>{restaurante.descanso ?? <PorConfirmar tipo="horário" marcador="—" />}</dd>
+          </div>
+        </dl>
+        {
+          porConfirmar && (
+            <p class="legenda-pc placa__legenda" data-legenda-por-confirmar>
+              Horário por confirmar com a casa
+            </p>
+          )
+        }
+      </div>
+
+      <ul class="servicos" aria-label="Serviços">
+        {restaurante.servicos.map((s) => <li>{s}</li>)}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .horario__grelha {
+    display: grid;
+    gap: 2rem;
+  }
+
+  .horario__nota {
+    margin-top: 0.9rem;
+    color: var(--cinza);
+    max-width: 30ch;
+  }
+
+  /* Placa de azulejo: moldura com o padrão e um "cartão" de cal por dentro. */
+  .placa {
+    padding: 14px;
+    background: var(--azulejo) center / 56px;
+    border-radius: var(--raio);
+    box-shadow: 0 0 0 2px var(--azul);
+  }
+
+  .placa__linhas {
+    background: var(--cal);
+    border-radius: calc(var(--raio) - 4px);
+    padding: 0.5rem 1.25rem;
+  }
+
+  .placa__linha {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 0.85rem;
+    border-bottom: 1px solid var(--linha);
+    font-size: 1.1rem;
+  }
+
+  .placa__linha dt {
+    font-family: var(--f-titulo);
+    font-weight: 700;
+  }
+
+  .placa__linha--descanso {
+    border-bottom: 0;
+    color: var(--vinho);
+  }
+
+  .placa__legenda {
+    padding-block: 0 0.75rem;
+  }
+
+  .servicos {
+    margin-top: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+
+  .servicos li {
+    background: var(--azul);
+    color: #fff;
+    font-family: var(--f-titulo);
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.35rem 0.8rem;
+    border-radius: 999px;
+  }
+
+  @media (min-width: 860px) {
+    .horario__grelha {
+      grid-template-columns: 1fr 1.2fr;
+      align-items: center;
+      gap: 4rem;
+    }
+  }
+</style>

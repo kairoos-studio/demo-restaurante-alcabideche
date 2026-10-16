@@ -1,0 +1,93 @@
+---
+/** Barra fixa no telemóvel, que aparece depois do hero. */
+---
+
+<!-- Nasce inerte (fora da tabulação); só fica ativa quando aparece. -->
+<nav class="barra" data-barra aria-label="Atalhos" inert>
+  <a href="#menu">Carta</a>
+  <a href="#onde">Mapa</a>
+  <a class="barra__reservar" href="#reservar">Reservar</a>
+</nav>
+
+<script>
+  const barra = document.querySelector<HTMLElement>('[data-barra]');
+  const hero = document.querySelector('#topo');
+  const reserva = document.querySelector('#reservar');
+  if (barra && hero && 'IntersectionObserver' in window) {
+    let depoisDoHero = false;
+    let naReserva = false;
+    const atualizar = () => {
+      const visivel = depoisDoHero && !naReserva;
+      barra.classList.toggle('barra--visivel', visivel);
+      // Escondida, sai da tabulação e dos leitores de ecrã.
+      barra.inert = !visivel;
+    };
+    new IntersectionObserver(([e]) => {
+      depoisDoHero = !e.isIntersecting;
+      atualizar();
+    }).observe(hero);
+    // Esconde-se na secção de reserva, para não tapar o formulário.
+    if (reserva) {
+      new IntersectionObserver(
+        ([e]) => {
+          naReserva = e.isIntersecting;
+          atualizar();
+        },
+        { rootMargin: '-30% 0px -30% 0px' },
+      ).observe(reserva);
+    }
+  }
+</script>
+
+<style>
+  .barra {
+    position: fixed;
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: calc(0.75rem + env(safe-area-inset-bottom));
+    z-index: 20;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.4fr;
+    gap: 0.35rem;
+    padding: 0.35rem;
+    border-radius: 999px;
+    background: rgb(250 246 238 / 0.94);
+    backdrop-filter: blur(8px);
+    box-shadow:
+      0 0 0 1.5px var(--azul),
+      0 14px 30px -12px rgb(14 29 71 / 0.55);
+    transform: translateY(160%);
+    visibility: hidden;
+    transition:
+      transform 0.3s ease,
+      visibility 0s linear 0.3s;
+  }
+
+  .barra--visivel {
+    transform: none;
+    visibility: visible;
+    transition: transform 0.3s ease;
+  }
+
+  .barra a {
+    display: grid;
+    place-items: center;
+    min-height: 2.9rem;
+    border-radius: 999px;
+    font-family: var(--f-titulo);
+    font-weight: 700;
+    text-decoration: none;
+    color: var(--azul);
+  }
+
+  .barra__reservar {
+    background: var(--azul);
+    color: #fff !important;
+  }
+
+  @media (min-width: 900px) {
+    .barra {
+      display: none;
+    }
+  }
+</style>

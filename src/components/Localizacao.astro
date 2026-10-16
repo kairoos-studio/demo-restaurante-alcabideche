@@ -1,0 +1,101 @@
+---
+import { restaurante } from '../config/restaurante';
+import { linkMapa } from '../lib/formatar';
+
+const { rua, codigoPostal } = restaurante.morada;
+const mapa = linkMapa(`${restaurante.tipo} ${restaurante.nome}, ${rua}, ${codigoPostal}`);
+---
+
+<section class="seccao onde" id="onde" aria-labelledby="onde-titulo">
+  <div class="contentor onde__grelha">
+    <div class="revelar">
+      <p class="sobretitulo">Onde estamos</p>
+      <h2 id="onde-titulo">Em Alvide, fora do reboliço.</h2>
+    </div>
+
+    <div class="onde__cartao revelar">
+      <address class="onde__morada">
+        <strong>{restaurante.tipo} {restaurante.nome}</strong>
+        <span>{rua}</span>
+        <span>{codigoPostal}</span>
+        <span class="onde__zona">Alvide · Cascais</span>
+      </address>
+
+      <a class="botao botao--principal onde__mapa" href={mapa} target="_blank" rel="noopener">
+        Abrir no mapa
+        <span aria-hidden="true">↗</span>
+      </a>
+
+      <ul class="onde__notas">
+        <li>
+          <strong>Estacionamento.</strong> Há estacionamento: pode vir de carro sem receio.
+        </li>
+        <li><strong>Fora do centro.</strong> Em Alvide, freguesia de Alcabideche, longe do trânsito do centro de Cascais.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .onde__grelha {
+    display: grid;
+    gap: 2rem;
+  }
+
+  .onde__cartao {
+    background: #fff;
+    border-radius: var(--raio);
+    padding: 1.5rem 1.25rem;
+    box-shadow: 0 0 0 2px var(--azul);
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .onde__morada {
+    font-style: normal;
+    display: grid;
+    gap: 0.1rem;
+    font-size: 1.15rem;
+  }
+
+  .onde__morada strong {
+    font-family: var(--f-titulo);
+    font-size: 1.5rem;
+    color: var(--azul);
+    margin-bottom: 0.2rem;
+  }
+
+  .onde__zona {
+    color: var(--cinza);
+    font-size: 0.95rem;
+  }
+
+  .onde__mapa {
+    justify-self: start;
+  }
+
+  .onde__notas {
+    display: grid;
+    gap: 0.7rem;
+    border-top: 1px solid var(--linha);
+    padding-top: 1.1rem;
+    color: var(--cinza);
+  }
+
+  .onde__notas strong {
+    color: var(--tinta);
+    font-family: var(--f-titulo);
+  }
+
+  @media (min-width: 860px) {
+    .onde__grelha {
+      grid-template-columns: 1fr 1.2fr;
+      align-items: center;
+      gap: 4rem;
+    }
+
+    .onde__cartao {
+      padding: 2rem;
+    }
+  }
+</style>

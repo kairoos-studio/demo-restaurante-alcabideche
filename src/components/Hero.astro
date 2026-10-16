@@ -1,0 +1,257 @@
+---
+import { Image } from 'astro:assets';
+import { restaurante, destaques } from '../config/restaurante';
+import { fotos } from '../config/imagens';
+
+const foto = fotos.polvoLagareiro;
+---
+
+<header class="hero" id="topo">
+  <div class="contentor hero__grelha">
+    <div class="hero__texto">
+      <p class="hero__zona">{restaurante.tipo} · {restaurante.zona}</p>
+      <h1 class="hero__nome">
+        <span class="hero__artigo">A</span>
+        <span class="hero__palavra">Ponte</span>
+      </h1>
+      <svg class="hero__arco" viewBox="0 0 240 28" aria-hidden="true" focusable="false">
+        <path d="M2 26 Q120 -10 238 26" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"></path>
+        <path d="M60 15v11M120 6v20M180 15v11" stroke="currentColor" stroke-width="3" stroke-linecap="round"></path>
+      </svg>
+      <p class="hero__mote">{restaurante.mote}</p>
+    </div>
+
+    <figure class="hero__foto">
+      <div class="hero__moldura">
+        <Image
+          src={foto.src}
+          alt={foto.alt}
+          widths={[480, 720, 960, 1200]}
+          sizes="(min-width: 900px) 460px, 92vw"
+          loading="eager"
+          fetchpriority="high"
+        />
+      </div>
+      <figcaption>Foto ilustrativa</figcaption>
+    </figure>
+
+    <div class="hero__acoes">
+      <a class="botao botao--principal" href="#reservar">Reservar mesa</a>
+      <a class="botao botao--contorno" href="#menu">Ver a carta</a>
+    </div>
+
+    <ul class="hero__pratos" aria-label="Pratos da casa">
+      {destaques.map((d) => <li>{d.nome}</li>)}
+    </ul>
+  </div>
+</header>
+
+<style>
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding-block: 1.25rem 2.5rem;
+  }
+
+  /* Lambrim de azulejo atrás da foto. */
+  .hero::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 11rem;
+    background: var(--azulejo) center top / 56px;
+    border-top: 4px solid var(--azul);
+    z-index: -1;
+  }
+
+  .hero__grelha {
+    display: grid;
+    grid-template-areas:
+      'texto'
+      'foto'
+      'acoes'
+      'pratos';
+  }
+
+  .hero__texto {
+    grid-area: texto;
+  }
+
+  .hero__zona {
+    font-family: var(--f-titulo);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--vinho);
+  }
+
+  .hero__nome {
+    margin-top: 0.2rem;
+    display: flex;
+    align-items: baseline;
+    gap: 0.1em;
+    color: var(--azul);
+    font-weight: 800;
+    font-size: clamp(4.6rem, 24vw, 9.5rem);
+    line-height: 0.88;
+    letter-spacing: -0.045em;
+  }
+
+  .hero__artigo {
+    font-size: 0.55em;
+    font-weight: 600;
+    color: var(--vinho);
+  }
+
+  .hero__arco {
+    display: block;
+    width: min(15rem, 66%);
+    margin-top: 0.2rem;
+    color: var(--azul);
+  }
+
+  .hero__mote {
+    margin-top: 0.6rem;
+    font-size: clamp(1.1rem, 4.4vw, 1.45rem);
+    font-style: italic;
+    line-height: 1.35;
+  }
+
+  .hero__foto {
+    grid-area: foto;
+    margin-top: 1.1rem;
+    position: relative;
+  }
+
+  /* Arco de ponte: topo em meia-lua, como as janelas das casas antigas. */
+  .hero__moldura {
+    border-radius: 50% 50% var(--raio) var(--raio) / 38% 38% var(--raio) var(--raio);
+    overflow: hidden;
+    border: 5px solid var(--cal);
+    box-shadow:
+      0 0 0 2px var(--azul),
+      0 30px 50px -28px rgb(14 29 71 / 0.75);
+    aspect-ratio: 16 / 10;
+    background: var(--areia);
+  }
+
+  .hero__moldura img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 45%;
+    animation: aproximar 1.4s ease-out both;
+  }
+
+  @keyframes aproximar {
+    from {
+      transform: scale(1.08);
+      opacity: 0.4;
+    }
+  }
+
+  .hero__foto figcaption {
+    position: absolute;
+    top: 0.9rem;
+    right: 0.4rem;
+    font-size: 0.68rem;
+    color: var(--cinza);
+  }
+
+  /* Os botões sobem para cima da base da foto. */
+  .hero__acoes {
+    grid-area: acoes;
+    position: relative;
+    z-index: 1;
+    margin-top: -1.7rem;
+    padding-inline: 0.75rem;
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 0.6rem;
+  }
+
+  .hero__acoes .botao {
+    white-space: nowrap;
+    padding-inline: 1rem;
+  }
+
+  .hero__acoes .botao--contorno {
+    background: var(--cal);
+  }
+
+  .hero__pratos {
+    grid-area: pratos;
+    margin-top: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.3rem 0.8rem;
+    font-family: var(--f-titulo);
+    font-size: 0.88rem;
+    font-weight: 650;
+    color: var(--azul-noite);
+  }
+
+  .hero__pratos li {
+    background: var(--cal);
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+  }
+
+  @media (min-width: 900px) {
+    .hero {
+      padding-block: 4rem 5rem;
+    }
+
+    .hero::after {
+      height: 13rem;
+    }
+
+    .hero__grelha {
+      grid-template-columns: 1.1fr 1fr;
+      grid-template-areas:
+        'texto foto'
+        'acoes foto'
+        'pratos foto';
+      grid-template-rows: auto auto 1fr;
+      column-gap: 4rem;
+    }
+
+    .hero__texto {
+      align-self: end;
+    }
+
+    .hero__foto {
+      margin-top: 0;
+    }
+
+    .hero__moldura {
+      aspect-ratio: 4 / 4.6;
+      border-radius: 999px 999px var(--raio) var(--raio);
+    }
+
+    .hero__acoes {
+      margin-top: 2rem;
+      padding-inline: 0;
+      display: flex;
+    }
+
+    .hero__pratos {
+      justify-content: flex-start;
+      align-self: start;
+      margin-top: 1.5rem;
+    }
+
+    .hero__pratos li {
+      padding-inline: 0;
+      background: none;
+    }
+
+    .hero__pratos li + li::before {
+      content: '·';
+      margin-right: 0.8rem;
+      color: var(--vinho);
+    }
+  }
+</style>
