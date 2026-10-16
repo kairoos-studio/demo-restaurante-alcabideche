@@ -1,0 +1,68 @@
+---
+import { Image } from 'astro:assets';
+import { galeria } from '../config/imagens';
+---
+
+<section class="seccao galeria" id="galeria" aria-labelledby="galeria-titulo">
+  <div class="contentor">
+    <div class="revelar">
+      <p class="sobretitulo">À mesa</p>
+      <h2 id="galeria-titulo">Brasa, mar<br />e um copo de vinho</h2>
+      <p class="galeria__nota">Fotos ilustrativas, não são do restaurante.</p>
+    </div>
+
+    <ul class="galeria__grelha">
+      {
+        galeria.map((foto) => (
+          <li class="galeria__item revelar">
+            <Image src={foto.src} alt={foto.alt} widths={[400, 720, 1000]} sizes="(min-width: 900px) 40vw, 92vw" />
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .galeria__nota {
+    margin-top: 0.8rem;
+    font-size: 0.85rem;
+    color: var(--cinza);
+  }
+
+  .galeria__grelha {
+    margin-top: 2rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-auto-rows: 11rem;
+    gap: 0.6rem;
+  }
+
+  .galeria__item {
+    border-radius: var(--raio);
+    overflow: hidden;
+    background: var(--areia);
+  }
+
+  .galeria__item:nth-child(1) {
+    grid-row: span 2;
+  }
+
+  .galeria__item:nth-child(4) {
+    grid-column: span 2;
+  }
+
+  .galeria__item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  @media (min-width: 900px) {
+    .galeria__grelha {
+      grid-template-columns: 1.2fr 1fr 1fr;
+      grid-auto-rows: 15rem;
+      gap: 1rem;
+    }
+  }
+</style>

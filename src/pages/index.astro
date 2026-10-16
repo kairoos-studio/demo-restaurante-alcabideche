@@ -1,0 +1,32 @@
+---
+import Base from '../layouts/Base.astro';
+import BarraMovel from '../components/BarraMovel.astro';
+import FaixaConceito from '../components/FaixaConceito.astro';
+import Galeria from '../components/Galeria.astro';
+import Hero from '../components/Hero.astro';
+import Horario from '../components/Horario.astro';
+import Localizacao from '../components/Localizacao.astro';
+import Menu from '../components/Menu.astro';
+import Reserva from '../components/Reserva.astro';
+import Rodape from '../components/Rodape.astro';
+import Sobre from '../components/Sobre.astro';
+import { restaurante } from '../config/restaurante';
+---
+
+<Base
+  titulo={`${restaurante.tipo} ${restaurante.nome} · Alvide, Alcabideche (conceito)`}
+  descricao="Conceito não oficial de site para o Restaurante A Ponte, cozinha portuguesa tradicional em Alvide, Alcabideche."
+>
+  <FaixaConceito />
+  <Hero />
+  <main>
+    <Horario />
+    <Menu />
+    <Galeria />
+    <Sobre />
+    <Reserva />
+    <Localizacao />
+  </main>
+  <Rodape />
+  <BarraMovel />
+</Base>

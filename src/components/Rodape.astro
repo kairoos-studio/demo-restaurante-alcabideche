@@ -1,0 +1,170 @@
+---
+import PorConfirmar from './PorConfirmar.astro';
+import { restaurante } from '../config/restaurante';
+import { fotos } from '../config/imagens';
+import { MARCADOR_TELEFONE } from '../lib/formatar';
+
+const creditos = Object.values(fotos);
+const ano = new Date().getFullYear();
+---
+
+<footer class="rodape">
+  <div class="contentor rodape__grelha">
+    <div>
+      <p class="rodape__nome">A Ponte</p>
+      <p class="rodape__tipo">{restaurante.tipo} · Cozinha portuguesa</p>
+    </div>
+
+    <dl class="rodape__dados">
+      <div>
+        <dt>Morada</dt>
+        <dd>{restaurante.morada.rua}, {restaurante.morada.codigoPostal}</dd>
+      </div>
+      <div>
+        <dt>Telefone</dt>
+        <dd>{restaurante.telefone ?? <PorConfirmar tipo="telefone" marcador={MARCADOR_TELEFONE} />}</dd>
+      </div>
+      <div>
+        <dt>Pagamentos</dt>
+        <dd>MB Way e cartões</dd>
+      </div>
+    </dl>
+
+    <nav class="rodape__links" aria-label="Secções">
+      <a href="#horario">Horário</a>
+      <a href="#menu">Carta</a>
+      <a href="#reservar">Reservar</a>
+      <a href="#onde">Como chegar</a>
+    </nav>
+
+    <details class="rodape__creditos">
+      <summary>Créditos das imagens</summary>
+      <p>Fotos ilustrativas do Wikimedia Commons; não são do restaurante. Redimensionadas e recomprimidas.</p>
+      <ul>
+        {
+          creditos.map((f) => (
+            <li>
+              <a href={f.fonte} rel="noopener" target="_blank">
+                {f.alt}
+              </a>
+              , {f.autor}, {f.licenca}
+            </li>
+          ))
+        }
+      </ul>
+    </details>
+
+    <p class="rodape__aviso">Conceito não oficial, feito para apresentação. Não é o site do restaurante.</p>
+    <p class="rodape__fim">Demonstração · {ano}</p>
+  </div>
+</footer>
+
+<style>
+  .rodape {
+    background: var(--azul-noite);
+    color: rgb(255 255 255 / 0.85);
+    padding-block: 3rem calc(2rem + env(safe-area-inset-bottom));
+    font-size: 0.95rem;
+  }
+
+  .rodape__grelha {
+    display: grid;
+    gap: 1.75rem;
+  }
+
+  .rodape__nome {
+    font-family: var(--f-titulo);
+    font-size: 2.6rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    color: #fff;
+    line-height: 1;
+  }
+
+  .rodape__tipo {
+    margin-top: 0.35rem;
+    color: rgb(255 255 255 / 0.65);
+  }
+
+  .rodape__dados {
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .rodape__dados dt {
+    font-family: var(--f-titulo);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 0.55);
+  }
+
+  .rodape__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+    font-family: var(--f-titulo);
+    font-weight: 600;
+  }
+
+  .rodape__links a {
+    text-decoration: none;
+    padding-block: 0.4rem;
+  }
+
+  .rodape__links a:hover {
+    text-decoration: underline;
+  }
+
+  .rodape__creditos {
+    border-top: 1px solid rgb(255 255 255 / 0.15);
+    padding-top: 1.25rem;
+    font-size: 0.82rem;
+    color: rgb(255 255 255 / 0.7);
+  }
+
+  .rodape__creditos summary {
+    cursor: pointer;
+    font-family: var(--f-titulo);
+    font-weight: 600;
+    color: #fff;
+    min-height: 2.75rem;
+    display: flex;
+    align-items: center;
+  }
+
+  .rodape__creditos p {
+    margin-bottom: 0.6rem;
+  }
+
+  .rodape__creditos ul {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .rodape__aviso {
+    font-size: 0.82rem;
+    border: 1px dashed rgb(255 255 255 / 0.35);
+    border-radius: 8px;
+    padding: 0.7rem 0.9rem;
+  }
+
+  .rodape__fim {
+    font-size: 0.75rem;
+    color: rgb(255 255 255 / 0.5);
+  }
+
+  @media (min-width: 860px) {
+    .rodape__grelha {
+      grid-template-columns: 1fr 1.4fr 1fr;
+      align-items: start;
+    }
+
+    .rodape__creditos,
+    .rodape__aviso,
+    .rodape__fim {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

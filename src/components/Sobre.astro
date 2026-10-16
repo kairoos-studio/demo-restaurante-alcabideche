@@ -1,0 +1,138 @@
+---
+import { Image } from 'astro:assets';
+import { fotos } from '../config/imagens';
+
+const pontos = [
+  {
+    titulo: 'Casa de família',
+    texto: 'Ambiente familiar e gente da zona à mesa. Come-se como em casa, sem cerimónias.',
+  },
+  {
+    titulo: 'Cozinha tradicional',
+    texto: 'Peixe fresco, carnes na brasa e arroz no tacho. Pratos portugueses de sempre, sem pressas.',
+  },
+  {
+    titulo: 'Vale a viagem',
+    texto: 'Fica fora do centro de Cascais, em Alvide. É mesmo por isso que vale a pena lá ir.',
+  },
+];
+const foto = fotos.vinho;
+---
+
+<section class="seccao sobre" id="sobre" aria-labelledby="sobre-titulo">
+  <div class="contentor sobre__grelha">
+    <div class="sobre__cabeca revelar">
+      <p class="sobretitulo">Sobre a casa</p>
+      <h2 id="sobre-titulo">Vale a viagem para fora do centro.</h2>
+    </div>
+
+    <ol class="sobre__pontos">
+      {
+        pontos.map((p) => (
+          <li class="revelar">
+            <h3>{p.titulo}</h3>
+            <p>{p.texto}</p>
+          </li>
+        ))
+      }
+    </ol>
+
+    <figure class="sobre__foto revelar">
+      <Image src={foto.src} alt={foto.alt} widths={[600, 1000]} sizes="(min-width: 900px) 40vw, 92vw" />
+    </figure>
+  </div>
+</section>
+
+<style>
+  .sobre {
+    background: var(--azul-noite);
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Faixa de azulejo no topo da secção, a lembrar um lambrim. */
+  .sobre::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 28px;
+    background: var(--azulejo) center / 28px;
+    opacity: 0.95;
+  }
+
+  .sobre .sobretitulo {
+    color: #f3c6cd;
+  }
+
+  .sobre__grelha {
+    display: grid;
+    gap: 2.25rem;
+  }
+
+  .sobre h2 {
+    max-width: 14ch;
+  }
+
+  .sobre__pontos {
+    display: grid;
+    gap: 1.5rem;
+    counter-reset: ponto;
+  }
+
+  .sobre__pontos li {
+    counter-increment: ponto;
+    padding-left: 3.25rem;
+    position: relative;
+  }
+
+  .sobre__pontos li::before {
+    content: counter(ponto);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 2.3rem;
+    height: 2.3rem;
+    border-radius: 50%;
+    border: 2px solid rgb(255 255 255 / 0.5);
+    display: grid;
+    place-items: center;
+    font-family: var(--f-titulo);
+    font-weight: 700;
+  }
+
+  .sobre__pontos h3 {
+    font-size: 1.4rem;
+  }
+
+  .sobre__pontos p {
+    margin-top: 0.35rem;
+    color: rgb(255 255 255 / 0.82);
+  }
+
+  .sobre__foto {
+    border-radius: var(--raio);
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+  }
+
+  .sobre__foto img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  @media (min-width: 900px) {
+    .sobre__grelha {
+      grid-template-columns: 1fr 1fr;
+      column-gap: 4rem;
+      align-items: start;
+    }
+
+    .sobre__foto {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+      aspect-ratio: 4 / 5;
+    }
+  }
+</style>
