@@ -57,37 +57,44 @@ const pessoas = Array.from({ length: 10 }, (_, i) => i + 1);
           <span class="mock" title="Demonstração: este formulário não envia dados">Simulação · não envia</span>
         </div>
 
-        <label class="campo">
-          <span>Nome</span>
-          <input name="nome" autocomplete="name" required placeholder="O seu nome" />
-        </label>
+        <noscript>
+          <p class="form__semjs">Esta simulação precisa de JavaScript. Sem ele, o formulário fica desativado e nada é enviado.</p>
+        </noscript>
 
-        <div class="campo__par">
+        <!-- Desativado até o script ligar a simulação: sem JS, não há submissão possível. -->
+        <fieldset class="form__campos" id="campos-reserva" disabled>
           <label class="campo">
-            <span>Dia</span>
-            <input name="dia" type="date" required />
+            <span>Nome</span>
+            <input name="nome" autocomplete="name" required placeholder="O seu nome" />
           </label>
+
+          <div class="campo__par">
+            <label class="campo">
+              <span>Dia</span>
+              <input name="dia" type="date" required />
+            </label>
+            <label class="campo">
+              <span>Hora</span>
+              <input name="hora" type="time" required />
+            </label>
+          </div>
+
           <label class="campo">
-            <span>Hora</span>
-            <input name="hora" type="time" required />
+            <span>Pessoas</span>
+            <select name="pessoas" required>
+              {pessoas.map((n) => <option value={n} selected={n === 2}>{n === 10 ? '10 ou mais' : n}</option>)}
+            </select>
           </label>
-        </div>
 
-        <label class="campo">
-          <span>Pessoas</span>
-          <select name="pessoas" required>
-            {pessoas.map((n) => <option value={n} selected={n === 2}>{n === 10 ? '10 ou mais' : n}</option>)}
-          </select>
-        </label>
+          <label class="campo">
+            <span>Notas <small>(opcional)</small></span>
+            <textarea name="notas" rows="2" placeholder="Aniversário, cadeira de bebé, mesa grande…"></textarea>
+          </label>
 
-        <label class="campo">
-          <span>Notas <small>(opcional)</small></span>
-          <textarea name="notas" rows="2" placeholder="Aniversário, cadeira de bebé, mesa grande…"></textarea>
-        </label>
+          <p class="form__erro" role="alert" hidden>Preencha o nome, o dia e a hora.</p>
 
-        <p class="form__erro" role="alert" hidden>Preencha o nome, o dia e a hora.</p>
-
-        <button class="botao botao--principal form__enviar" type="submit">Pedir reserva</button>
+          <button class="botao botao--principal form__enviar" type="submit">Pedir reserva</button>
+        </fieldset>
       </form>
 
       <div class="confirmacao" id="confirmacao" hidden tabindex="-1">
@@ -115,6 +122,9 @@ const pessoas = Array.from({ length: 10 }, (_, i) => i + 1);
 
   if (dia) dia.min = dataLocalISO(new Date());
 
+  // A simulação só fica ativa depois de o handler que impede o envio estar instalado (mais abaixo).
+  const campos = document.querySelector<HTMLFieldSetElement>('#campos-reserva');
+
   form?.addEventListener('submit', (evento) => {
     evento.preventDefault();
     const nome = form.querySelector<HTMLInputElement>('input[name="nome"]');
@@ -140,6 +150,8 @@ const pessoas = Array.from({ length: 10 }, (_, i) => i + 1);
       confirmacao.focus();
     }
   });
+
+  if (campos) campos.disabled = false;
 
   document.querySelector('#nova-reserva')?.addEventListener('click', () => {
     form?.reset();
@@ -195,6 +207,21 @@ const pessoas = Array.from({ length: 10 }, (_, i) => i + 1);
   .form {
     display: grid;
     gap: 1rem;
+  }
+
+  .form__campos {
+    display: grid;
+    gap: 1rem;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+  }
+
+  .form__semjs {
+    font-size: 0.9rem;
+    color: var(--vinho);
+    font-weight: 600;
   }
 
   .form__topo {
