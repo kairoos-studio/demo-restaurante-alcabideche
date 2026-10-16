@@ -1,0 +1,58 @@
+---
+import '@fontsource-variable/bricolage-grotesque';
+import '@fontsource-variable/literata';
+import '@fontsource-variable/literata/wght-italic.css';
+import '../styles/global.css';
+import { restaurante } from '../config/restaurante';
+
+interface Props {
+  titulo: string;
+  descricao: string;
+}
+
+const { titulo, descricao } = Astro.props;
+---
+
+<!doctype html>
+<html lang="pt-PT">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{titulo}</title>
+    <meta name="description" content={descricao} />
+    <!-- Conceito não oficial: não indexar nem seguir links. -->
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#faf6ee" />
+    <meta property="og:title" content={titulo} />
+    <meta property="og:description" content={descricao} />
+    <meta property="og:locale" content="pt_PT" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="application-name" content={restaurante.nome} />
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
+  </head>
+  <body>
+    <slot />
+    <script>
+      // Revela os blocos ao entrarem no ecrã.
+      const blocos = document.querySelectorAll('.revelar');
+      if ('IntersectionObserver' in window) {
+        const observador = new IntersectionObserver(
+          (entradas) => {
+            for (const e of entradas) {
+              if (e.isIntersecting) {
+                e.target.classList.add('visivel');
+                observador.unobserve(e.target);
+              }
+            }
+          },
+          { rootMargin: '0px 0px -8% 0px' },
+        );
+        blocos.forEach((b) => observador.observe(b));
+      } else {
+        blocos.forEach((b) => b.classList.add('visivel'));
+      }
+    </script>
+  </body>
+</html>
